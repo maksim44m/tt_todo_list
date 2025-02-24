@@ -22,6 +22,13 @@ class TaskManager:
     def get_tasks(self):
         return self.tasks
 
+    def get_task(self, task_id: int):
+        task = [t for t in self.tasks if t.id == task_id][0]
+        if task:
+            return task
+        else:
+            raise HTTPException(status_code=404, detail='Task not found')
+
     def post_tasks(self, task: TaskCreate):
         self.id += 1
         new_task = Tasks(id=self.id, **task.dict())
@@ -38,6 +45,13 @@ tasks_manager = TaskManager()
          tags=['Get tasks'])
 def get_tasks():
     return tasks_manager.get_tasks()
+
+
+@app.get(path='/tasks/{task_id}',
+         response_model=Tasks,
+         tags=['Get task by id'])
+def get_task(task_id: int):
+    return tasks_manager.get_task(task_id)
 
 
 @app.post(path='/tasks',
