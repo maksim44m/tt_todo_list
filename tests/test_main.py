@@ -6,7 +6,6 @@ from sqlalchemy.pool import StaticPool
 from main import app, tasks_manager, Response
 from database import DB, Base
 
-# connect_args = {"check_same_thread": False, "uri": True}
 test_engine = create_engine(f'sqlite:///:memory:',
                             connect_args={"check_same_thread": False},
                             poolclass=StaticPool,
@@ -14,12 +13,12 @@ test_engine = create_engine(f'sqlite:///:memory:',
 
 
 def override_get_db_session():
-    # Функция для переопределения зависимости DB для тестов
+    # переопределение зависимости DB для тестов
     with DB(test_engine) as test_db:
         yield test_db.session
 
 
-@pytest.fixture(autouse=True)
+@pytest.fixture(autouse=True)  # автовызов перед каждым тестом
 def reset_db():
     Base.metadata.drop_all(test_engine)
     Base.metadata.create_all(test_engine)
